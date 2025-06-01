@@ -3,7 +3,7 @@ import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, MapPin, Building, Users, CheckCircle, XCircle, Phone, Mail, Calendar, Clock } from "lucide-react";
+import { ArrowLeft, MapPin, Building, Users, CheckCircle, XCircle, Phone, Mail, Calendar, Clock, Search } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import AriesNavigation from "@/components/AriesNavigation";
 import AriesWatermark from "@/components/AriesWatermark";
@@ -119,6 +119,12 @@ const SubmissionDetail = () => {
     });
   };
 
+  const handleDeepResearch = () => {
+    navigate("/facility-research", {
+      state: { submission }
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4">
       <AriesWatermark />
@@ -177,6 +183,12 @@ const SubmissionDetail = () => {
 
             {/* Action Buttons */}
             <div className="flex space-x-4">
+              {submission.performsSkinGrafts && (
+                <Button onClick={handleDeepResearch} className="bg-purple-600 hover:bg-purple-700">
+                  <Search className="w-4 h-4 mr-2" />
+                  Deep Research
+                </Button>
+              )}
               <Button onClick={handleAIDraftEmail} className="bg-blue-600 hover:bg-blue-700">
                 <Mail className="w-4 h-4 mr-2" />
                 AI Draft Email
