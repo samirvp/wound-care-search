@@ -1,10 +1,12 @@
-import { useState, useMemo } from "react";
+
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Building, Users, CheckCircle, XCircle, Mail, MapPin, Calendar, TrendingUp, User, BarChart3, Target, Clock } from "lucide-react";
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
+import { Search, Building, Users, CheckCircle, XCircle, Mail, MapPin, Calendar, TrendingUp, User, BarChart3, Target, Clock, Phone } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import AriesNavigation from "@/components/AriesNavigation";
 import AriesWatermark from "@/components/AriesWatermark";
