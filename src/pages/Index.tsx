@@ -5,12 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Search, MapPin, Heart, Users, TrendingUp } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-
 const Index = () => {
   const [zipCode, setZipCode] = useState("");
   const [facilityName, setFacilityName] = useState("");
   const navigate = useNavigate();
-
   const handleSearch = () => {
     if (!zipCode || !facilityName) {
       toast({
@@ -32,30 +30,27 @@ const Index = () => {
     // Get existing searches from localStorage
     const existingSearches = JSON.parse(localStorage.getItem("woundcare-searches") || "[]");
     existingSearches.unshift(searchData);
-    
+
     // Keep only last 50 searches
     const limitedSearches = existingSearches.slice(0, 50);
     localStorage.setItem("woundcare-searches", JSON.stringify(limitedSearches));
-
     toast({
       title: "Search initiated!",
-      description: `Searching for wound care clinics near ${zipCode}...`,
+      description: `Searching for wound care clinics near ${zipCode}...`
     });
 
     // Navigate to dashboard
     navigate("/dashboard");
   };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-green-50 to-blue-100">
+  return <div className="min-h-screen bg-gradient-to-br from-blue-50 via-green-50 to-blue-100">
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         {/* Background Pattern */}
         <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-green-400/20 opacity-50"></div>
         <div className="absolute inset-0" style={{
-          backgroundImage: `radial-gradient(circle at 2px 2px, rgba(59, 130, 246, 0.1) 1px, transparent 0)`,
-          backgroundSize: '40px 40px'
-        }}></div>
+        backgroundImage: `radial-gradient(circle at 2px 2px, rgba(59, 130, 246, 0.1) 1px, transparent 0)`,
+        backgroundSize: '40px 40px'
+      }}></div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-20">
           {/* Header */}
@@ -71,9 +66,7 @@ const Index = () => {
               </div>
             </div>
             
-            <h1 className="text-5xl lg:text-6xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent mb-6">
-              WoundCare Finder
-            </h1>
+            <h1 className="text-5xl lg:text-6xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent mb-6">Aries Medical Partners</h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
               Discover specialized wound care clinics nationwide. Simply enter your zip code and facility name to begin your journey to better healing.
             </p>
@@ -91,30 +84,15 @@ const Index = () => {
                 <div className="space-y-4">
                   <div className="relative">
                     <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-500 w-5 h-5" />
-                    <Input
-                      type="text"
-                      placeholder="Enter your zip code (e.g., 90210)"
-                      value={zipCode}
-                      onChange={(e) => setZipCode(e.target.value)}
-                      className="pl-12 h-14 text-lg rounded-xl border-2 border-gray-200 focus:border-blue-400 transition-colors"
-                    />
+                    <Input type="text" placeholder="Enter your zip code (e.g., 90210)" value={zipCode} onChange={e => setZipCode(e.target.value)} className="pl-12 h-14 text-lg rounded-xl border-2 border-gray-200 focus:border-blue-400 transition-colors" />
                   </div>
 
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-500 w-5 h-5" />
-                    <Input
-                      type="text"
-                      placeholder="Facility name (e.g., Healing Center)"
-                      value={facilityName}
-                      onChange={(e) => setFacilityName(e.target.value)}
-                      className="pl-12 h-14 text-lg rounded-xl border-2 border-gray-200 focus:border-green-400 transition-colors"
-                    />
+                    <Input type="text" placeholder="Facility name (e.g., Healing Center)" value={facilityName} onChange={e => setFacilityName(e.target.value)} className="pl-12 h-14 text-lg rounded-xl border-2 border-gray-200 focus:border-green-400 transition-colors" />
                   </div>
 
-                  <Button
-                    onClick={handleSearch}
-                    className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600 text-white rounded-xl shadow-lg transform transition hover:scale-105"
-                  >
+                  <Button onClick={handleSearch} className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600 text-white rounded-xl shadow-lg transform transition hover:scale-105">
                     Search Wound Care Clinics
                   </Button>
                 </div>
@@ -156,8 +134,6 @@ const Index = () => {
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
