@@ -4,12 +4,13 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Search, MapPin, Heart, Users, TrendingUp, Clock, Zap, Target, Globe, Phone, Linkedin } from "lucide-react";
+import { Search, MapPin, Heart, Users, TrendingUp, Clock, Zap, Target, Globe, Phone, Linkedin, Upload, FileSpreadsheet, ChevronDown } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 const Index = () => {
   const [zipCode, setZipCode] = useState("");
   const [facilityName, setFacilityName] = useState("");
+  const [showUploadOptions, setShowUploadOptions] = useState(false);
   const navigate = useNavigate();
 
   const handleSearch = () => {
@@ -39,12 +40,24 @@ const Index = () => {
     localStorage.setItem("woundcare-searches", JSON.stringify(limitedSearches));
     
     toast({
-      title: "Search initiated!",
-      description: `Searching for wound care clinics near ${zipCode}...`
+      title: "Searching with AI Intelligence Powered by Data Maverick",
+      description: `Unleashing AI power to discover everything about ${facilityName} near ${zipCode}...`
     });
 
     // Navigate to dashboard
     navigate("/dashboard");
+  };
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      toast({
+        title: "File uploaded successfully!",
+        description: `Processing ${file.name} for bulk facility search...`
+      });
+      // Here you would typically process the Excel file
+      navigate("/dashboard");
+    }
   };
 
   return (
@@ -165,6 +178,59 @@ const Index = () => {
                   >
                     Unleash AI-Powered Research
                   </Button>
+
+                  {/* Upload Section */}
+                  <div className="relative mt-6">
+                    <div className="flex items-center justify-center">
+                      <div className="flex-grow border-t border-gray-300"></div>
+                      <span className="flex-shrink mx-4 text-gray-500 text-sm font-medium">OR</span>
+                      <div className="flex-grow border-t border-gray-300"></div>
+                    </div>
+                    
+                    <div className="mt-4 relative">
+                      <Button
+                        variant="outline"
+                        onClick={() => setShowUploadOptions(!showUploadOptions)}
+                        className="w-full h-12 border-2 border-dashed border-blue-300 hover:border-blue-400 bg-blue-50/50 hover:bg-blue-100/50 text-blue-700 rounded-xl transition-all duration-200"
+                      >
+                        <Upload className="w-5 h-5 mr-2" />
+                        Bulk Upload Facilities
+                        <ChevronDown className={`w-4 h-4 ml-2 transition-transform duration-200 ${showUploadOptions ? 'rotate-180' : ''}`} />
+                      </Button>
+
+                      {showUploadOptions && (
+                        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-200 p-4 z-10">
+                          <div className="space-y-3">
+                            <div className="text-center">
+                              <p className="text-sm text-gray-600 mb-3">Upload multiple facilities at once</p>
+                            </div>
+                            
+                            <label className="block">
+                              <input
+                                type="file"
+                                accept=".xlsx,.xls,.csv"
+                                onChange={handleFileUpload}
+                                className="hidden"
+                              />
+                              <div className="flex items-center justify-center p-4 border-2 border-dashed border-green-300 rounded-lg hover:border-green-400 hover:bg-green-50/50 cursor-pointer transition-all">
+                                <FileSpreadsheet className="w-5 h-5 text-green-600 mr-2" />
+                                <span className="text-green-700 font-medium">Upload Excel File</span>
+                              </div>
+                            </label>
+                            
+                            <div className="text-center">
+                              <p className="text-xs text-gray-500">
+                                Supported formats: .xlsx, .xls, .csv
+                              </p>
+                              <p className="text-xs text-gray-500 mt-1">
+                                Include columns: Facility Name, Zip Code
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             </Card>
