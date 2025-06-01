@@ -84,12 +84,12 @@ const Index = () => {
                 <div className="space-y-4">
                   <div className="relative">
                     <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-500 w-5 h-5" />
-                    <Input type="text" placeholder="Enter your zip code (e.g., 90210)" value={zipCode} onChange={e => setZipCode(e.target.value)} className="pl-12 h-14 text-lg rounded-xl border-2 border-gray-200 focus:border-blue-400 transition-colors" />
+                    <Input type="text" placeholder="Enter your zip code (e.g., 90210)" value={zipCode} onChange={e => setZipCode(e.target.value)} className="pl-12 h-14 text-lg border-2 border-gray-200 focus:border-blue-400 transition-colors rounded-full bg-slate-100" />
                   </div>
 
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-500 w-5 h-5" />
-                    <Input type="text" placeholder="Facility name (e.g., Healing Center)" value={facilityName} onChange={e => setFacilityName(e.target.value)} className="pl-12 h-14 text-lg rounded-xl border-2 border-gray-200 focus:border-green-400 transition-colors" />
+                    <Input type="text" placeholder="Facility name (e.g., Healing Center)" value={facilityName} onChange={e => setFacilityName(e.target.value)} className="pl-12 h-14 text-lg rounded-xl border-2 border-gray-200 focus:border-green-400 transition-colors bg-gray-200" />
                   </div>
 
                   <Button onClick={handleSearch} className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600 text-white rounded-xl shadow-lg transform transition hover:scale-105">
