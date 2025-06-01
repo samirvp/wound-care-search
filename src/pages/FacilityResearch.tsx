@@ -1,11 +1,12 @@
-
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Search, Building, TrendingUp, Users, DollarSign, FileText, Calendar, Phone, Mail, Globe, MapPin } from "lucide-react";
+import { ArrowLeft, Search, Brain, Target, CheckCircle, Building, Users, DollarSign, Activity, Award, TrendingUp, Calendar, Phone, Mail, Globe, FileText, BarChart3 } from "lucide-react";
+import AriesNavigation from "@/components/AriesNavigation";
+import AriesWatermark from "@/components/AriesWatermark";
 
 const FacilityResearch = () => {
   const location = useLocation();
@@ -105,26 +106,21 @@ const FacilityResearch = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4 relative">
+      <AriesWatermark />
+      
+      <div className="max-w-6xl mx-auto relative z-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-6 bg-white rounded-xl p-6 shadow-lg border border-gray-100">
           <div className="flex items-center space-x-4">
-            <Button 
-              variant="outline" 
-              onClick={() => navigate(`/submission/${submission.id}`, { state: { submission } })}
-              className="flex items-center space-x-2 shadow-sm hover:shadow-md transition-shadow"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Back to Details</span>
-            </Button>
+            <AriesNavigation />
             <div>
-              <h1 className="text-2xl font-bold text-gray-800">Comprehensive Facility Research</h1>
-              <p className="text-gray-600">Deep dive analysis for skin graft facilities</p>
+              <h1 className="text-2xl font-bold text-gray-800">Facility Research</h1>
+              <p className="text-gray-600">Comprehensive skin graft facility analysis</p>
             </div>
           </div>
-          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-            {submission.facilityName}
+          <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+            Skin Graft Analysis
           </Badge>
         </div>
 

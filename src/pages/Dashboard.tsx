@@ -1,11 +1,13 @@
-
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ArrowLeft, Calendar, MapPin, Search, TrendingUp, Users, Clock, Building, Mail, CheckCircle, XCircle, User, Phone, Globe } from "lucide-react";
+import { Search, Building, Users, CheckCircle, XCircle, Mail, MapPin, Calendar, TrendingUp, User, BarChart3, Target, Clock } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import AriesNavigation from "@/components/AriesNavigation";
+import AriesWatermark from "@/components/AriesWatermark";
 
 interface SearchRecord {
   id: number;
@@ -211,25 +213,18 @@ const Dashboard = () => {
   const displaySearches = getFilteredSearches("year"); // Show all for table
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4 relative">
+      <AriesWatermark />
+      
+      <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6 bg-white rounded-xl p-6 shadow-lg border border-gray-100">
-          <div className="flex items-center space-x-4">
-            <Button variant="outline" onClick={() => navigate("/")} className="flex items-center space-x-2 shadow-sm hover:shadow-md transition-shadow">
-              <ArrowLeft className="w-4 h-4" />
-              <span>New Search</span>
-            </Button>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-800">
-                WoundCare Research Dashboard
-              </h1>
-              <p className="text-gray-600">Advanced Business Intelligence & Facility Analytics</p>
+        <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100 mb-6">
+          <div className="flex items-center justify-between">
+            <AriesNavigation />
+            <div className="text-right">
+              <h2 className="text-xl font-bold text-gray-800">Dashboard</h2>
+              <p className="text-gray-600">Facility Research & Outreach Management</p>
             </div>
-          </div>
-          <div className="bg-green-50 rounded-lg p-3 border border-green-200 shadow-sm">
-            <p className="text-xs text-green-600 font-medium">Status</p>
-            <p className="text-sm font-bold text-green-700">✓ Active Session</p>
           </div>
         </div>
 

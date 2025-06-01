@@ -6,11 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Search, MapPin, Heart, Users, TrendingUp, Clock, Zap, Target, Globe, Phone, Linkedin, Upload, FileSpreadsheet, ChevronDown } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import SearchProgress from "@/components/SearchProgress";
+import AriesWatermark from "@/components/AriesWatermark";
 
 const Index = () => {
   const [zipCode, setZipCode] = useState("");
   const [facilityName, setFacilityName] = useState("");
   const [showUploadOptions, setShowUploadOptions] = useState(false);
+  const [showProgress, setShowProgress] = useState(false);
   const navigate = useNavigate();
 
   const handleSearch = () => {
@@ -23,6 +26,10 @@ const Index = () => {
       return;
     }
 
+    setShowProgress(true);
+  };
+
+  const handleSearchComplete = () => {
     // Auto-login and save search data
     const searchData = {
       zipCode,
@@ -40,10 +47,11 @@ const Index = () => {
     localStorage.setItem("woundcare-searches", JSON.stringify(limitedSearches));
     
     toast({
-      title: "Searching with AI Intelligence Powered by Data Maverick",
-      description: `Unleashing AI power to discover everything about ${facilityName} near ${zipCode}...`
+      title: "AI Research Complete!",
+      description: `Comprehensive intelligence gathered for ${facilityName} near ${zipCode}`
     });
 
+    setShowProgress(false);
     // Navigate to dashboard
     navigate("/dashboard");
   };
@@ -61,7 +69,11 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-green-50 to-blue-100">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-green-50 to-blue-100 relative">
+      <AriesWatermark />
+      
+      {showProgress && <SearchProgress onComplete={handleSearchComplete} />}
+      
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         {/* Background Pattern */}
@@ -71,7 +83,7 @@ const Index = () => {
           backgroundSize: '40px 40px'
         }}></div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-20">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-20 z-10">
           {/* Header */}
           <div className="text-center mb-16">
             <div className="flex justify-center mb-6">

@@ -1,9 +1,10 @@
-
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, MapPin, Building, Users, Mail, Phone, Globe, Calendar, CheckCircle, XCircle, Search, TrendingUp } from "lucide-react";
+import AriesNavigation from "@/components/AriesNavigation";
+import AriesWatermark from "@/components/AriesWatermark";
 
 const SubmissionDetail = () => {
   const location = useLocation();
@@ -12,8 +13,9 @@ const SubmissionDetail = () => {
 
   if (!submission) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
-        <Card className="p-8 bg-white rounded-xl border border-gray-200 shadow-lg">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center relative">
+        <AriesWatermark />
+        <Card className="p-8 bg-white rounded-xl border border-gray-200 shadow-lg relative z-10">
           <p className="text-gray-600">No submission data found.</p>
           <Button onClick={() => navigate("/dashboard")} className="mt-4">
             Back to Dashboard
@@ -42,19 +44,14 @@ const SubmissionDetail = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4 relative">
+      <AriesWatermark />
+      
+      <div className="max-w-4xl mx-auto relative z-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-6 bg-white rounded-xl p-6 shadow-lg border border-gray-100">
           <div className="flex items-center space-x-4">
-            <Button 
-              variant="outline" 
-              onClick={() => navigate("/dashboard")}
-              className="flex items-center space-x-2 shadow-sm hover:shadow-md transition-shadow"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Back to Dashboard</span>
-            </Button>
+            <AriesNavigation />
             <div>
               <h1 className="text-2xl font-bold text-gray-800">Facility Details</h1>
               <p className="text-gray-600">Comprehensive facility information</p>
