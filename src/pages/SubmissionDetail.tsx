@@ -1,26 +1,104 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, MapPin, Building, Users, Mail, Phone, Globe, Calendar, CheckCircle, XCircle, Search, TrendingUp } from "lucide-react";
+import { ArrowLeft, MapPin, Building, Users, CheckCircle, XCircle, Phone, Mail, Calendar, Clock } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 import AriesNavigation from "@/components/AriesNavigation";
 import AriesWatermark from "@/components/AriesWatermark";
 
+interface SubmissionData {
+  id: number;
+  zipCode: string;
+  facilityName: string;
+  address: string;
+  performsSkinGrafts: boolean;
+  privatePractice: boolean;
+  outreached: boolean;
+  timestamp: string;
+  submittedBy: "Dana" | "Tiffany";
+  lastTouchPoint?: string;
+  nextFollowUp?: string;
+}
+
 const SubmissionDetail = () => {
-  const location = useLocation();
   const navigate = useNavigate();
-  const submission = location.state?.submission;
+  const { id } = useParams();
+  const location = useLocation();
+  const [submission, setSubmission] = useState<SubmissionData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // First try to get data from router state
+    const stateSubmission = location.state?.submission;
+    
+    if (stateSubmission) {
+      setSubmission(stateSubmission);
+      setLoading(false);
+      return;
+    }
+
+    // If no state data, try to find it in localStorage
+    try {
+      const storedSearches = JSON.parse(localStorage.getItem("woundcare-searches") || "[]");
+      const foundSubmission = storedSearches.find((s: SubmissionData) => s.id === parseInt(id || "0"));
+      
+      if (foundSubmission) {
+        setSubmission(foundSubmission);
+        // Store in state for future navigation
+        window.history.replaceState({ submission: foundSubmission }, '', window.location.pathname);
+      } else {
+        console.log("No submission found with ID:", id);
+        toast({
+          title: "Submission not found",
+          description: "The requested submission could not be found. Redirecting to dashboard.",
+          variant: "destructive"
+        });
+        // Redirect to dashboard after a short delay
+        setTimeout(() => navigate("/dashboard"), 2000);
+      }
+    } catch (error) {
+      console.error("Error loading submission data:", error);
+      toast({
+        title: "Error loading data",
+        description: "There was an error loading the submission data. Redirecting to dashboard.",
+        variant: "destructive"
+      });
+      setTimeout(() => navigate("/dashboard"), 2000);
+    }
+    
+    setLoading(false);
+  }, [id, location.state, navigate]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center py-12">
+            <div className="animate-spin h-8 w-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading submission data...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!submission) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center relative">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4">
         <AriesWatermark />
-        <Card className="p-8 bg-white rounded-xl border border-gray-200 shadow-lg relative z-10">
-          <p className="text-gray-600">No submission data found.</p>
-          <Button onClick={() => navigate("/dashboard")} className="mt-4">
-            Back to Dashboard
-          </Button>
-        </Card>
+        <div className="max-w-4xl mx-auto relative z-10">
+          <div className="text-center py-12">
+            <XCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">No submission data found</h2>
+            <p className="text-gray-600 mb-6">The submission you're looking for could not be found.</p>
+            <Button onClick={() => navigate("/dashboard")} className="bg-blue-600 hover:bg-blue-700">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Dashboard
+            </Button>
+          </div>
+        </div>
       </div>
     );
   }
@@ -35,203 +113,139 @@ const SubmissionDetail = () => {
     });
   };
 
-  const handleSkinGraftResearch = () => {
-    navigate("/facility-research", { state: { submission } });
-  };
-
-  const handleDraftEmail = () => {
-    navigate("/ai-email-draft", { state: { submission } });
+  const handleAIDraftEmail = () => {
+    navigate("/ai-email-draft", {
+      state: { submission }
+    });
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4 relative">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4">
       <AriesWatermark />
       
       <div className="max-w-4xl mx-auto relative z-10">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6 bg-white rounded-xl p-6 shadow-lg border border-gray-100">
-          <div className="flex items-center space-x-4">
+        <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100 mb-6">
+          <div className="flex items-center justify-between">
             <AriesNavigation />
-            <div>
-              <h1 className="text-2xl font-bold text-gray-800">Facility Details</h1>
-              <p className="text-gray-600">Comprehensive facility information</p>
+            <div className="text-right">
+              <h2 className="text-xl font-bold text-gray-800">Facility Intelligence Report</h2>
+              <p className="text-gray-600">Comprehensive research & analysis</p>
             </div>
           </div>
-          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-            Submission #{submission.id}
-          </Badge>
         </div>
 
+        {/* Back Button */}
+        <Button 
+          onClick={() => navigate("/dashboard")} 
+          variant="outline" 
+          className="mb-6 hover:bg-gray-50"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to Dashboard
+        </Button>
+
         {/* Main Content */}
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Facility Information */}
-          <div className="lg:col-span-2 space-y-6">
-            <Card className="p-6 bg-white rounded-xl border border-gray-200 shadow-lg">
-              <div className="flex items-center space-x-3 mb-6">
-                <Building className="w-6 h-6 text-blue-600" />
-                <h2 className="text-xl font-bold text-gray-800">Facility Information</h2>
-              </div>
-              
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-800 mb-2">{submission.facilityName}</h3>
-                  <div className="flex items-center space-x-2 text-gray-600">
-                    <MapPin className="w-4 h-4" />
-                    <span>{submission.address}</span>
-                  </div>
+        <div className="grid gap-6">
+          {/* Facility Overview */}
+          <Card className="p-8 bg-white rounded-xl border border-gray-200 shadow-lg">
+            <div className="flex items-start justify-between mb-6">
+              <div>
+                <h1 className="text-3xl font-bold text-gray-800 mb-2">{submission.facilityName}</h1>
+                <div className="flex items-center text-gray-600 mb-4">
+                  <MapPin className="w-5 h-5 mr-2" />
+                  <span>{submission.address}</span>
                 </div>
-                
-                <div className="grid md:grid-cols-2 gap-4 pt-4 border-t border-gray-100">
-                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <span className="text-gray-700 font-medium">Onsite Skin Grafts</span>
+                <div className="flex items-center space-x-4">
+                  <Badge variant={submission.privatePractice ? "default" : "secondary"} className="text-sm">
+                    {submission.privatePractice ? "Private Practice" : "Hospital Network"}
+                  </Badge>
+                  <Badge variant={submission.performsSkinGrafts ? "default" : "destructive"} className="text-sm">
+                    {submission.performsSkinGrafts ? "Performs Skin Grafts" : "No Skin Grafts"}
+                  </Badge>
+                  <Badge variant={submission.outreached ? "default" : "outline"} className="text-sm">
+                    {submission.outreached ? "Contacted" : "New Lead"}
+                  </Badge>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-sm text-gray-500">Researched by</p>
+                <p className="font-semibold text-gray-800">{submission.submittedBy}</p>
+                <p className="text-xs text-gray-400 mt-1">{formatDate(submission.timestamp)}</p>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex space-x-4">
+              <Button onClick={handleAIDraftEmail} className="bg-blue-600 hover:bg-blue-700">
+                <Mail className="w-4 h-4 mr-2" />
+                AI Draft Email
+              </Button>
+              <Button variant="outline" className="border-green-600 text-green-600 hover:bg-green-50">
+                <Phone className="w-4 h-4 mr-2" />
+                Call Now
+              </Button>
+              <Button variant="outline">
+                <Calendar className="w-4 h-4 mr-2" />
+                Schedule Follow-up
+              </Button>
+            </div>
+          </Card>
+
+          {/* Intelligence Insights */}
+          <div className="grid md:grid-cols-2 gap-6">
+            <Card className="p-6 bg-white rounded-xl border border-gray-200 shadow-lg">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                <Building className="w-5 h-5 mr-2 text-blue-600" />
+                Practice Intelligence
+              </h3>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Practice Type:</span>
+                  <span className="font-medium">{submission.privatePractice ? "Private Practice" : "Hospital Network"}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Skin Graft Services:</span>
+                  <div className="flex items-center">
                     {submission.performsSkinGrafts ? (
-                      <Button
-                        onClick={handleSkinGraftResearch}
-                        className="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-all flex items-center space-x-2"
-                      >
-                        <CheckCircle className="w-4 h-4" />
-                        <span>Yes - Research Now</span>
-                        <TrendingUp className="w-4 h-4" />
-                      </Button>
+                      <>
+                        <CheckCircle className="w-4 h-4 text-green-500 mr-1" />
+                        <span className="text-green-700 font-medium">Available</span>
+                      </>
                     ) : (
-                      <div className="flex items-center space-x-1">
-                        <XCircle className="w-5 h-5 text-red-500" />
-                        <span className="text-red-700 font-semibold">No</span>
-                      </div>
+                      <>
+                        <XCircle className="w-4 h-4 text-red-500 mr-1" />
+                        <span className="text-red-700 font-medium">Not Available</span>
+                      </>
                     )}
                   </div>
-                  
-                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <span className="text-gray-700 font-medium">Private Practice</span>
-                    <span className={`font-semibold ${submission.privatePractice ? 'text-blue-700' : 'text-gray-600'}`}>
-                      {submission.privatePractice ? 'Yes' : 'No'}
-                    </span>
-                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Market Area:</span>
+                  <span className="font-medium">{submission.zipCode}</span>
                 </div>
               </div>
             </Card>
 
-            {/* Mock Additional Details */}
             <Card className="p-6 bg-white rounded-xl border border-gray-200 shadow-lg">
-              <div className="flex items-center space-x-3 mb-6">
-                <Users className="w-6 h-6 text-green-600" />
-                <h2 className="text-xl font-bold text-gray-800">Staff & Services</h2>
-              </div>
-              
-              <div className="space-y-4">
-                <div>
-                  <h4 className="font-semibold text-gray-800 mb-2">Lead Physician</h4>
-                  <p className="text-gray-600">Dr. Sarah Martinez, MD - Board Certified Wound Care Specialist</p>
-                  <p className="text-sm text-gray-500">15+ years experience, Johns Hopkins Medical School</p>
+              <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                <Clock className="w-5 h-5 mr-2 text-green-600" />
+                Outreach Timeline
+              </h3>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Last Touch Point:</span>
+                  <span className="font-medium">{submission.lastTouchPoint || "Initial research"}</span>
                 </div>
-                
-                <div>
-                  <h4 className="font-semibold text-gray-800 mb-2">Specialties</h4>
-                  <div className="flex flex-wrap gap-2">
-                    <Badge variant="secondary">Diabetic Ulcers</Badge>
-                    <Badge variant="secondary">Pressure Sores</Badge>
-                    <Badge variant="secondary">Venous Insufficiency</Badge>
-                    <Badge variant="secondary">Hyperbaric Therapy</Badge>
-                  </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Next Follow-up:</span>
+                  <span className="font-medium">{submission.nextFollowUp || "TBD"}</span>
                 </div>
-                
-                <div>
-                  <h4 className="font-semibold text-gray-800 mb-2">Equipment</h4>
-                  <ul className="text-gray-600 space-y-1">
-                    <li>• Hyperbaric Oxygen Chamber (2 units)</li>
-                    <li>• Negative Pressure Wound Therapy</li>
-                    <li>• Ultrasonic Debridement System</li>
-                    <li>• Advanced Imaging Equipment</li>
-                  </ul>
-                </div>
-              </div>
-            </Card>
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Contact & Outreach */}
-            <Card className="p-6 bg-white rounded-xl border border-gray-200 shadow-lg">
-              <div className="flex items-center space-x-3 mb-6">
-                <Mail className="w-6 h-6 text-purple-600" />
-                <h2 className="text-lg font-bold text-gray-800">Outreach Status</h2>
-              </div>
-              
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <span className="text-gray-700 font-medium">Outreached</span>
-                  <span className={`font-semibold ${submission.outreached ? 'text-green-700' : 'text-orange-600'}`}>
-                    {submission.outreached ? '✓ Completed' : '⏳ Pending'}
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Status:</span>
+                  <span className={`font-medium ${submission.outreached ? 'text-green-700' : 'text-orange-600'}`}>
+                    {submission.outreached ? "Active Pipeline" : "New Lead"}
                   </span>
-                </div>
-                
-                <div className="space-y-2">
-                  <Button 
-                    onClick={handleDraftEmail}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow-md transition-shadow"
-                  >
-                    <Mail className="w-4 h-4 mr-2" />
-                    Draft AI Email
-                  </Button>
-                  
-                  <Button variant="outline" className="w-full border-gray-300 hover:border-gray-400">
-                    <Phone className="w-4 h-4 mr-2" />
-                    Schedule Call
-                  </Button>
-                  
-                  <Button variant="outline" className="w-full border-gray-300 hover:border-gray-400">
-                    <Globe className="w-4 h-4 mr-2" />
-                    Visit Website
-                  </Button>
-                </div>
-              </div>
-            </Card>
-
-            {/* Submission Info */}
-            <Card className="p-6 bg-white rounded-xl border border-gray-200 shadow-lg">
-              <div className="flex items-center space-x-3 mb-6">
-                <Calendar className="w-6 h-6 text-orange-600" />
-                <h2 className="text-lg font-bold text-gray-800">Submission Info</h2>
-              </div>
-              
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Submitted by:</span>
-                  <span className={`font-medium px-2 py-1 rounded-full text-xs ${
-                    submission.submittedBy === "Dana" ? "bg-purple-100 text-purple-800" : "bg-pink-100 text-pink-800"
-                  }`}>
-                    {submission.submittedBy}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Date:</span>
-                  <span className="text-gray-800">{formatDate(submission.timestamp)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Zip Code:</span>
-                  <span className="text-gray-800">{submission.zipCode}</span>
-                </div>
-              </div>
-            </Card>
-
-            <Card className="p-6 bg-white rounded-xl border border-gray-200 shadow-lg">
-              <h3 className="font-bold text-gray-800 mb-4">Quick Stats</h3>
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Patient Volume:</span>
-                  <span className="text-gray-800 font-medium">~150/month</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Avg. Treatment Cost:</span>
-                  <span className="text-gray-800 font-medium">$2,400</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Success Rate:</span>
-                  <span className="text-green-600 font-medium">94%</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Network Size:</span>
-                  <span className="text-gray-800 font-medium">7 locations</span>
                 </div>
               </div>
             </Card>

@@ -26,11 +26,22 @@ const GooglePlacesAutocomplete: React.FC<GooglePlacesAutocompleteProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const autocompleteRef = useRef<any>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [hasValidKey, setHasValidKey] = useState(false);
 
-  // Google API Key - This should be set as a public environment variable
-  const GOOGLE_API_KEY = "YOUR_GOOGLE_PLACES_API_KEY"; // Replace with actual key
+  // Check if API key is set (you can replace this with your actual key)
+  const GOOGLE_API_KEY = process.env.REACT_APP_GOOGLE_PLACES_API_KEY || "YOUR_GOOGLE_PLACES_API_KEY";
 
   useEffect(() => {
+    // Check if we have a valid API key
+    if (GOOGLE_API_KEY === "YOUR_GOOGLE_PLACES_API_KEY" || !GOOGLE_API_KEY) {
+      console.log("Google Places API key not configured");
+      setIsLoaded(true);
+      setHasValidKey(false);
+      return;
+    }
+
+    setHasValidKey(true);
+
     // Check if Google Maps is already loaded
     if (window.google && window.google.maps && window.google.maps.places) {
       initializeAutocomplete();
@@ -50,62 +61,79 @@ const GooglePlacesAutocomplete: React.FC<GooglePlacesAutocompleteProps> = ({
       setIsLoaded(true);
     };
 
+    script.onerror = () => {
+      console.error("Failed to load Google Places API");
+      setIsLoaded(true);
+      setHasValidKey(false);
+    };
+
     document.head.appendChild(script);
 
     return () => {
       // Cleanup
       if (autocompleteRef.current) {
-        window.google.maps.event.clearInstanceListeners(autocompleteRef.current);
+        window.google?.maps?.event?.clearInstanceListeners(autocompleteRef.current);
       }
     };
-  }, []);
+  }, [GOOGLE_API_KEY]);
 
   const initializeAutocomplete = () => {
     if (!inputRef.current || !window.google) return;
 
-    // Create autocomplete instance with healthcare-focused options
-    autocompleteRef.current = new window.google.maps.places.Autocomplete(inputRef.current, {
-      types: ['establishment'],
-      fields: ['name', 'formatted_address', 'address_components', 'place_id', 'types'],
-      componentRestrictions: { country: 'us' } // Restrict to US
-    });
-
-    // Set up place selection handler
-    autocompleteRef.current.addListener('place_changed', () => {
-      const place = autocompleteRef.current.getPlace();
-      
-      if (!place || !place.name) return;
-
-      // Filter for healthcare-related establishments
-      const healthcareTypes = ['hospital', 'doctor', 'health', 'dentist', 'pharmacy', 'physiotherapist'];
-      const isHealthcare = place.types?.some((type: string) => 
-        healthcareTypes.some(healthType => type.toLowerCase().includes(healthType))
-      ) || place.name.toLowerCase().includes('wound') || 
-          place.name.toLowerCase().includes('clinic') ||
-          place.name.toLowerCase().includes('medical') ||
-          place.name.toLowerCase().includes('health');
-
-      // Extract zip code from address components
-      let zipCode = '';
-      if (place.address_components) {
-        const zipComponent = place.address_components.find((component: any) =>
-          component.types.includes('postal_code')
-        );
-        zipCode = zipComponent?.long_name || '';
-      }
-
-      // Update parent component
-      onChange(place.name);
-      onPlaceSelect({
-        name: place.name,
-        address: place.formatted_address || '',
-        zipCode: zipCode
+    try {
+      // Create autocomplete instance with healthcare-focused options
+      autocompleteRef.current = new window.google.maps.places.Autocomplete(inputRef.current, {
+        types: ['establishment'],
+        fields: ['name', 'formatted_address', 'address_components', 'place_id', 'types'],
+        componentRestrictions: { country: 'us' } // Restrict to US
       });
-    });
+
+      // Set up place selection handler
+      autocompleteRef.current.addListener('place_changed', () => {
+        const place = autocompleteRef.current.getPlace();
+        
+        if (!place || !place.name) return;
+
+        // Filter for healthcare-related establishments
+        const healthcareTypes = ['hospital', 'doctor', 'health', 'dentist', 'pharmacy', 'physiotherapist'];
+        const isHealthcare = place.types?.some((type: string) => 
+          healthcareTypes.some(healthType => type.toLowerCase().includes(healthType))
+        ) || place.name.toLowerCase().includes('wound') || 
+            place.name.toLowerCase().includes('clinic') ||
+            place.name.toLowerCase().includes('medical') ||
+            place.name.toLowerCase().includes('health');
+
+        // Extract zip code from address components
+        let zipCode = '';
+        if (place.address_components) {
+          const zipComponent = place.address_components.find((component: any) =>
+            component.types.includes('postal_code')
+          );
+          zipCode = zipComponent?.long_name || '';
+        }
+
+        // Update parent component
+        onChange(place.name);
+        onPlaceSelect({
+          name: place.name,
+          address: place.formatted_address || '',
+          zipCode: zipCode
+        });
+      });
+    } catch (error) {
+      console.error("Error initializing Google Places autocomplete:", error);
+      setHasValidKey(false);
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange(e.target.value);
+  };
+
+  const getPlaceholderText = () => {
+    if (!isLoaded) return "Loading...";
+    if (!hasValidKey) return "Enter facility name (autocomplete disabled - API key needed)";
+    return placeholder;
   };
 
   return (
@@ -114,15 +142,19 @@ const GooglePlacesAutocomplete: React.FC<GooglePlacesAutocompleteProps> = ({
       <Input
         ref={inputRef}
         type="text"
-        placeholder={isLoaded ? placeholder : "Loading Google Places..."}
+        placeholder={getPlaceholderText()}
         value={value}
         onChange={handleInputChange}
-        disabled={!isLoaded}
         className="pl-12 h-14 text-lg rounded-xl border-2 border-gray-200 focus:border-green-400 transition-colors bg-gray-50"
       />
       {!isLoaded && (
         <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
           <div className="animate-spin h-4 w-4 border-2 border-green-500 border-t-transparent rounded-full"></div>
+        </div>
+      )}
+      {!hasValidKey && isLoaded && (
+        <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+          <span className="text-yellow-500 text-xs">⚠️</span>
         </div>
       )}
     </div>
