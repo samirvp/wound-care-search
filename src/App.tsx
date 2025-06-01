@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import SubmissionDetail from "./pages/SubmissionDetail";
+import FacilityResearch from "./pages/FacilityResearch";
 import AIEmailDraft from "./pages/AIEmailDraft";
 import NotFound from "./pages/NotFound";
 
@@ -22,6 +23,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/submission/:id" element={<SubmissionDetail />} />
+          <Route path="/facility-research" element={<FacilityResearch />} />
           <Route path="/ai-email-draft" element={<AIEmailDraft />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, MapPin, Building, Users, Mail, Phone, Globe, Calendar, CheckCircle, XCircle } from "lucide-react";
+import { ArrowLeft, MapPin, Building, Users, Mail, Phone, Globe, Calendar, CheckCircle, XCircle, Search, TrendingUp } from "lucide-react";
 
 const SubmissionDetail = () => {
   const location = useLocation();
@@ -31,6 +31,14 @@ const SubmissionDetail = () => {
       hour: "2-digit",
       minute: "2-digit"
     });
+  };
+
+  const handleSkinGraftResearch = () => {
+    navigate("/facility-research", { state: { submission } });
+  };
+
+  const handleDraftEmail = () => {
+    navigate("/ai-email-draft", { state: { submission } });
   };
 
   return (
@@ -80,10 +88,14 @@ const SubmissionDetail = () => {
                   <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <span className="text-gray-700 font-medium">Onsite Skin Grafts</span>
                     {submission.performsSkinGrafts ? (
-                      <div className="flex items-center space-x-1">
-                        <CheckCircle className="w-5 h-5 text-green-500" />
-                        <span className="text-green-700 font-semibold">Yes</span>
-                      </div>
+                      <Button
+                        onClick={handleSkinGraftResearch}
+                        className="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-all flex items-center space-x-2"
+                      >
+                        <CheckCircle className="w-4 h-4" />
+                        <span>Yes - Research Now</span>
+                        <TrendingUp className="w-4 h-4" />
+                      </Button>
                     ) : (
                       <div className="flex items-center space-x-1">
                         <XCircle className="w-5 h-5 text-red-500" />
@@ -158,7 +170,7 @@ const SubmissionDetail = () => {
                 
                 <div className="space-y-2">
                   <Button 
-                    onClick={() => navigate("/ai-email-draft", { state: { submission } })}
+                    onClick={handleDraftEmail}
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow-md transition-shadow"
                   >
                     <Mail className="w-4 h-4 mr-2" />
@@ -205,7 +217,6 @@ const SubmissionDetail = () => {
               </div>
             </Card>
 
-            {/* Mock Analytics */}
             <Card className="p-6 bg-white rounded-xl border border-gray-200 shadow-lg">
               <h3 className="font-bold text-gray-800 mb-4">Quick Stats</h3>
               <div className="space-y-3 text-sm">
