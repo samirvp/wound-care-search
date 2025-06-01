@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -8,13 +7,29 @@ import { Search, MapPin, Heart, Users, TrendingUp, Clock, Zap, Target, Globe, Ph
 import { toast } from "@/hooks/use-toast";
 import SearchProgress from "@/components/SearchProgress";
 import AriesWatermark from "@/components/AriesWatermark";
+import GooglePlacesAutocomplete from "@/components/GooglePlacesAutocomplete";
 
 const Index = () => {
   const [zipCode, setZipCode] = useState("");
   const [facilityName, setFacilityName] = useState("");
+  const [selectedPlace, setSelectedPlace] = useState<{ name: string; address: string; zipCode: string } | null>(null);
   const [showUploadOptions, setShowUploadOptions] = useState(false);
   const [showProgress, setShowProgress] = useState(false);
   const navigate = useNavigate();
+
+  const handlePlaceSelect = (place: { name: string; address: string; zipCode: string }) => {
+    setSelectedPlace(place);
+    setFacilityName(place.name);
+    // Auto-populate zip code if available
+    if (place.zipCode && !zipCode) {
+      setZipCode(place.zipCode);
+    }
+    
+    toast({
+      title: "Facility Selected!",
+      description: `Found ${place.name} - ${place.address}`
+    });
+  };
 
   const handleSearch = () => {
     if (!zipCode || !facilityName) {
@@ -34,6 +49,7 @@ const Index = () => {
     const searchData = {
       zipCode,
       facilityName,
+      selectedPlace,
       timestamp: new Date().toISOString(),
       id: Date.now()
     };
@@ -97,12 +113,9 @@ const Index = () => {
               </div>
             </div>
             
-            <h1 className="text-5xl lg:text-6xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent mb-6">
+            <h1 className="text-5xl lg:text-6xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent mb-6 cursor-pointer hover:opacity-80 transition-opacity" onClick={() => navigate("/")}>
               Aries Medical Partners
             </h1>
-            <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed mb-8">
-              Your intelligent client discovery platform for wound care facilities. One search replaces hours of manual research - instantly uncover facility details, practice ownership, physician backgrounds, and professional networks.
-            </p>
             
             {/* Value Proposition */}
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 max-w-4xl mx-auto mb-12 shadow-lg border border-blue-100">
@@ -173,16 +186,21 @@ const Index = () => {
                     />
                   </div>
 
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-500 w-5 h-5" />
-                    <Input 
-                      type="text" 
-                      placeholder="Facility name (e.g., Healing Center)" 
-                      value={facilityName} 
-                      onChange={(e) => setFacilityName(e.target.value)} 
-                      className="pl-12 h-14 text-lg rounded-xl border-2 border-gray-200 focus:border-green-400 transition-colors bg-gray-200" 
-                    />
-                  </div>
+                  <GooglePlacesAutocomplete
+                    value={facilityName}
+                    onChange={setFacilityName}
+                    onPlaceSelect={handlePlaceSelect}
+                    placeholder="Search for healthcare facilities (e.g., Wound Health Care Specialists)"
+                  />
+
+                  {selectedPlace && (
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                      <p className="text-sm text-green-800">
+                        <strong>Selected:</strong> {selectedPlace.name}
+                      </p>
+                      <p className="text-xs text-green-600">{selectedPlace.address}</p>
+                    </div>
+                  )}
 
                   <Button 
                     onClick={handleSearch} 
